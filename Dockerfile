@@ -18,21 +18,21 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*   
 
 # Install Node.js directly
-RUN curl -fsSL https://nodejs.org/dist/v22.2.0/node-v22.2.0-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1
+# RUN curl -fsSL https://nodejs.org/dist/v22.2.0/node-v22.2.0-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1
 
 # Copy the entire project (including frontend and backend)
 COPY . /app/
 
 # Set execute permissions for the entrypoint script
-RUN chmod +x /app/backend/entrypoint.sh
+# RUN chmod +x /app/entrypoint.sh
 
 # Install frontend dependencies and build
-WORKDIR /app/frontend
-RUN npm ci
-RUN npm run build
+# WORKDIR /app/frontend
+# RUN npm ci
+# RUN npm run build
 
 # Switch back to backend directory
-WORKDIR /app/backend
+# WORKDIR /app/backend
 
 # Install pipenv
 RUN pip install uv
@@ -44,13 +44,13 @@ RUN pip install uv
 RUN uv sync
 
 # Activate the virtual environment
-ENV PATH="/app/backend/.venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Expose the port the app runs on
 EXPOSE 8000
 
 # Set the entrypoint script
-ENTRYPOINT ["sh", "/app/backend/entrypoint.sh"]
+# ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
 # Run the application 
 CMD ["uv", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
