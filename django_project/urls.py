@@ -40,6 +40,8 @@ urlpatterns = [
     path("api/accounts/", include("apps.accounts.urls", namespace="accounts")),
     # For email verification
     path("api/accounts/", include("allauth.urls")),
+    # ============================ Users URLs ================================================
+    path("api/users/", include("apps.users.urls", namespace="users")),
     # ============================ Frontend URLs ================================================
     # # Keep at the bottom such that all other routes are handled by the frontend
     path("", IndexView.as_view(), name="index"),
