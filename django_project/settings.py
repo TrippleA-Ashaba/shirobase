@@ -30,7 +30,7 @@ env = Env()
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str("SECRET_KEY", default="django-insecure-(1b!ufhb@g*wrs9-*e_s!ad#5!$t#a#-!b)pm5++n^9u)uuir+")
+SECRET_KEY = env.str("SECRET_KEY", default="")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
@@ -166,6 +166,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -179,14 +181,17 @@ AUTH_USER_MODEL = "users.User"
 # LOGIN_URL = "users:login"
 
 # ============================ CSRF Settings ============================
-CSRF_TRUSTED_ORIGINS = [
-    "https://shirobase.trippleaunit.com",
-    "https://testshirobase.trippleaunit.com",
-]
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[],
+)
 
-CSRF_EXEMPT_URLS = [
-    r"^/api",
-]
+CSRF_EXEMPT_URLS = env.list(
+    "CSRF_EXEMPT_URLS",
+    default=[
+        r"^/api",
+    ],
+)
 
 # ============================ Rest Framework ============================
 REST_FRAMEWORK = {
