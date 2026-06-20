@@ -1,6 +1,7 @@
 exclude = [
     "migrations",
-    ".venv"
+    ".venv",
+    "virtualenv"
 ]
 line-length = 120
 
