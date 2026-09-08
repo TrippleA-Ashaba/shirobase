@@ -14,12 +14,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from environ import Env
-from loguru import logger
 
 from django_project.permissions import GROUP_PERMISSIONS, PERMISSIONS  # noqa: F401
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 load_dotenv()
 
@@ -246,7 +245,19 @@ SPECTACULAR_SETTINGS = {
 
 # ===================================== Email settings =====================================
 # https://docs.djangoproject.com/en/5.1/topics/email/
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.console.EmailBackend",
+        "OPTIONS": {
+            # values from other deprecated EMAIL_* settings
+            # "host": env.str("EMAIL_HOST", default=""),
+            # "port": env.int("EMAIL_PORT", default=587),
+            # "username": env.str("EMAIL_HOST_USER", default=""),
+            # "password": env.str("EMAIL_HOST_PASSWORD", default=""),
+        },
+    },
+}
 
 # =============================== Debug toolbar & browser reload  ===============================
 INTERNAL_IPS = ["127.0.0.1"]
@@ -263,8 +274,77 @@ if DEBUG:
     ]
 
 
-# =============================== LEAVE THIS AT THE BOTTOM OF THE FILE ===============================
-# ===================================== Loguru settings =====================================
-# https://loguru.readthedocs.io/en/stable/overview.html#no-handler-no-formatter-no-filter-one-function-to-rule-them-all
-# LOG LEVELS: DEBUG, INFO, WARNING, ERROR, CRITICAL, SUCCESS
-logger.add("logs/shirobase.log", rotation="10 MB", retention="10 days")
+# ===================================== Logging settings =====================================
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
+        },
+        "verbose": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "{levelname} {server_time} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+        },
+        "console_verbose": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "django.server": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "mail_admins", "console_verbose"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "apps": {
+            "level": "INFO",
+            "handlers": ["console_verbose"],
+            "propagate": False,
+        },
+    },
+}
+
+# # =============================== Sentry settings =====================================
+# import sentry_sdk  # noqa: E402
+
+# sentry_sdk.init(
+#     dsn="http://05fce50d20294c6eb5c1a44a5fc125a0@glitchtip-glitchtip-4fjbeg-c6a431-89-250-75-110.sslip.io/1",
+#     traces_sample_rate=0.01,  # 1% of transactions — adjust to your needs
+#     auto_session_tracking=False,  # GlitchTip does not support sessions
+#     enable_logs=True,  # Opt-in: send logs to GlitchTip (uses disk space)
+# )
